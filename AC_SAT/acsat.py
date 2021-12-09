@@ -25,7 +25,8 @@ class AC_solver:
 
     def __init__(self, t_span=[0, 50]) -> None:
         self.t_span = t_span
-        pass
+        self.formula = None
+        self.sol = None
 
     def solve(self, formula: Formula):
         n_vars = formula.n_vars()
@@ -39,7 +40,7 @@ class AC_solver:
                 else:
                     c[m, -var - 1] = -1
         k = formula.k
-        sol = solve_ivp(formula_dynamics, self.t_span, val_at_0, args=(c, n_clauses, n_vars, k))
+        sol = solve_ivp(formula_dynamics, self.t_span, val_at_0, args=(c, n_clauses, n_vars, k), dense_output=True)
 
         s = sol.y[:n_vars:, -1]
         for i in range(n_vars):
@@ -47,4 +48,27 @@ class AC_solver:
                 formula.var_value[i+1] = True
             else:
                 formula.var_value[i+1] = False
+
+        self.formula = formula
+        self.sol = sol
         return formula.is_sat()
+
+    def plot_sol(self, save_path):
+        assert self.formula is not None
+        assert self.sol is not None
+
+        n_vars = self.formula.n_vars()
+        n_clauses = self.formula.n_clauses()
+        t = np.linspace(*(self.t_span), 300)
+        z = self.sol.sol(t)
+
+        plt.subplot(211)
+        plt.plot(t, z[:n_vars].T)
+        plt.xlabel('t')
+        plt.legend(['s{}'.format(i + 1) for i in range(n_vars)], shadow=True)
+        plt.subplot(212)
+        plt.plot(t, z[n_vars:].T)
+        plt.xlabel('t')
+        plt.legend(['a{}'.format(i + 1) for i in range(n_clauses)], shadow=True)
+        plt.savefig(save_path)
+        plt.clf()

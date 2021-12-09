@@ -6,5 +6,5 @@ setup(
    author='Yu-Neng Wang',
    author_email='wynwyn@stanford.edu',
    packages=['AC_SAT'],
-   install_requires=['scipy']
+   install_requires=['scipy', 'matplotlib', 'tqdm']
 )
