@@ -29,5 +29,5 @@ if __name__ == "__main__":
             for trial in tqdm(range(n_round)):
                 mgr.generate_random_ksat_formula(k, n_clauses, n_vars)
                 is_sat = mgr.solve(solver=solver)
-                save_path = os.path.join(var_dir, "{}_{}".format(is_sat, n_round))
+                save_path = os.path.join(var_dir, "{}_{}".format(is_sat, trial))
                 solver.plot_sol(save_path)
