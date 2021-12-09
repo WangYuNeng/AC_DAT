@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 from AC_SAT.formula import Formula
 
@@ -22,7 +23,8 @@ class AC_solver:
     Implement a dynamical system to solve SAT formula
     '''
 
-    def __init__(self) -> None:
+    def __init__(self, t_span=[0, 50]) -> None:
+        self.t_span = t_span
         pass
 
     def solve(self, formula: Formula):
@@ -37,11 +39,11 @@ class AC_solver:
                 else:
                     c[m, -var - 1] = -1
         k = formula.k
-        sol = solve_ivp(formula_dynamics, [0,15], val_at_0, args=(c, n_clauses, n_vars, k))
+        sol = solve_ivp(formula_dynamics, self.t_span, val_at_0, args=(c, n_clauses, n_vars, k))
 
-        assignment = sol.y[-1]
+        s = sol.y[:n_vars:, -1]
         for i in range(n_vars):
-            if assignment[i] > 0:
+            if s[i] > 0:
                 formula.var_value[i+1] = True
             else:
                 formula.var_value[i+1] = False
